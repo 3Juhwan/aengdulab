@@ -36,4 +36,8 @@ public class Ticket {
     public boolean issuable() {
         return quantity > 0;
     }
+
+    public void decrementQuantity() {
+        quantity--;
+    }
 }

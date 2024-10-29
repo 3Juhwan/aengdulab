@@ -19,11 +19,13 @@ public class MemberTicketService {
     private final TicketRepository ticketRepository;
     private final MemberTicketRepository memberTicketRepository;
 
+    @Transactional
     public void issue(Long memberId, Long ticketId) {
         Member member = getMember(memberId);
         Ticket ticket = getTicket(ticketId);
         validateIssuable(member, ticket);
         memberTicketRepository.save(new MemberTicket(member, ticket));
+        ticket.decrementQuantity();
     }
 
     private Member getMember(Long memberId) {
