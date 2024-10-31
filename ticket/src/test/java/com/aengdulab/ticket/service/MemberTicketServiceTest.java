@@ -1,7 +1,6 @@
 package com.aengdulab.ticket.service;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
 
 import com.aengdulab.ticket.domain.Member;
 import com.aengdulab.ticket.domain.MemberTicket;
@@ -9,14 +8,13 @@ import com.aengdulab.ticket.domain.Ticket;
 import com.aengdulab.ticket.repository.MemberRepository;
 import com.aengdulab.ticket.repository.MemberTicketRepository;
 import com.aengdulab.ticket.repository.TicketRepository;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
+@SuppressWarnings("NonAsciiCharacters")
 class MemberTicketServiceTest {
 
     @Autowired
