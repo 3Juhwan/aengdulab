@@ -8,6 +8,7 @@ import com.aengdulab.ticket.domain.Ticket;
 import com.aengdulab.ticket.repository.MemberRepository;
 import com.aengdulab.ticket.repository.MemberTicketRepository;
 import com.aengdulab.ticket.repository.TicketRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -28,6 +29,13 @@ class MemberTicketServiceTest {
 
     @Autowired
     private TicketRepository ticketRepository;
+
+    @BeforeEach
+    void setUp() {
+        memberTicketRepository.deleteAllInBatch();
+        memberRepository.deleteAllInBatch();
+        ticketRepository.deleteAllInBatch();
+    }
 
     @Test
     void 멤버_티켓_발행_제한_수를_초과하면_예외가_발생한다() {
@@ -50,5 +58,4 @@ class MemberTicketServiceTest {
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("티켓 재고가 소진되었습니다.");
     }
-
 }
