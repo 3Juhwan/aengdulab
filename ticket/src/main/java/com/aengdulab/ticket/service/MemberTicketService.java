@@ -31,7 +31,7 @@ public class MemberTicketService {
         Ticket ticket = getTicket(ticketId);
         validateIssuable(member, ticket);
         memberTicketRepository.save(new MemberTicket(member, ticket));
-        ticket.decrementQuantity();
+        ticketRepository.decrementQuantity(ticketId);
     }
 
     private Member getMember(Long memberId) {
