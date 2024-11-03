@@ -7,6 +7,8 @@ import com.aengdulab.ticket.repository.MemberRepository;
 import com.aengdulab.ticket.repository.MemberTicketRepository;
 import com.aengdulab.ticket.repository.TicketRepository;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.JDBCException;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +21,10 @@ public class MemberTicketService {
     private final TicketRepository ticketRepository;
     private final MemberTicketRepository memberTicketRepository;
 
+    @Retryable(
+            retryFor = {JDBCException.class},
+            maxAttempts = 10
+    )
     @Transactional
     public void issue(Long memberId, Long ticketId) {
         Member member = getMember(memberId);
@@ -44,7 +50,7 @@ public class MemberTicketService {
         }
         int issuedMemberTicketCount = memberTicketRepository.countByMember(member);
         if (issuedMemberTicketCount >= MemberTicket.MEMBER_TICKET_COUNT_MAX) {
-            throw new IllegalArgumentException("계정당 구매할 수 있는 티켓 수량을 넘었습니다.");
+            throw new IllegalArgumentException("계정당 구매할 수 있는 티켓 수량을 넘었습니다." + " memberId=" + member.getId());
         }
     }
 }
