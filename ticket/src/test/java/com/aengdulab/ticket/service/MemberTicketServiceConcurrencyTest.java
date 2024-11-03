@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -43,21 +44,25 @@ class MemberTicketServiceConcurrencyTest {
     }
 
     @Test
-    void 동시에_여러_멤버_티켓을_발행할_때_티켓_재고가_올바르게_수정된다() throws InterruptedException {
+    void 멤버_티켓을_발행하면_티켓_재고가_올바르게_수정된다() throws InterruptedException {
         Ticket ticket = ticketRepository.save(new Ticket("목성행", 10L));
         int memberCount = 5;
         int threadCount = memberCount * MemberTicket.MEMBER_TICKET_COUNT_MAX;
         List<Member> members = IntStream.range(0, memberCount)
-                .mapToObj(memberOrder -> memberRepository.save(new Member("test" + memberOrder)))
+                .mapToObj(memberOrder -> memberRepository.save(new Member("멤버" + memberOrder)))
                 .toList();
 
         CountDownLatch latch = new CountDownLatch(threadCount);
+        AtomicLong totalDuration = new AtomicLong(0);
         try (ExecutorService executorService = Executors.newFixedThreadPool(threadCount)) {
             for (Member member : members) {
                 IntStream.range(0, MemberTicket.MEMBER_TICKET_COUNT_MAX)
                         .forEach(ticketCount ->
                                 executorService.submit(() -> {
+                                    long startTime = System.currentTimeMillis();
                                     memberTicketService.issue(member.getId(), ticket.getId());
+                                    long duration = System.currentTimeMillis() - startTime;
+                                    totalDuration.addAndGet(duration);
                                     latch.countDown();
                                 })
                         );
@@ -65,17 +70,99 @@ class MemberTicketServiceConcurrencyTest {
         }
 
         latch.await();
+        System.out.println("[멤버 티켓을 발행하면 티켓 재고가 올바르게 수정된다]: " + totalDuration.get() + " ms");
 
         for (Member member : members) {
-            long issuedTicketCount = memberTicketRepository.countByMemberAndTicket(member, ticket);
+            long issuedTicketCount = memberTicketRepository.countByMember(member);
             assertThat(issuedTicketCount).isEqualTo(MemberTicket.MEMBER_TICKET_COUNT_MAX);
         }
 
         assertThat(getTicketQuantity(ticket)).isEqualTo(0);
-        assertThat(ticket.getQuantity()).isEqualTo(0);
+    }
+
+    @Test
+    void 멤버_티켓_최댓값에_맞게_계정별로_발행이_제한된다() throws InterruptedException {
+        Ticket jupiterTicket = ticketRepository.save(new Ticket("목성행", 100L));
+        Ticket marsTicket = ticketRepository.save(new Ticket("화성행", 100L));
+        int memberCount = 3;
+        int ticketIssueCount = 3 * MemberTicket.MEMBER_TICKET_COUNT_MAX;
+        int threadCount = memberCount * ticketIssueCount;
+        List<Member> members = IntStream.range(0, memberCount)
+                .mapToObj(memberOrder -> memberRepository.save(new Member("멤버" + memberOrder)))
+                .toList();
+
+
+        CountDownLatch latch = new CountDownLatch(threadCount);
+        AtomicLong totalDuration = new AtomicLong(0);
+        try (ExecutorService executorService = Executors.newFixedThreadPool(threadCount)) {
+            for (Member member : members) {
+                IntStream.range(0, ticketIssueCount)
+                        .forEach(ticketCount -> {
+                            Long ticketId = getRandomTicket(jupiterTicket, marsTicket).getId();
+                            executorService.submit(() -> {
+                                long startTime = System.currentTimeMillis();
+                                try {
+                                    memberTicketService.issue(member.getId(), ticketId);
+                                } finally {
+                                    long duration = System.currentTimeMillis() - startTime;
+                                    totalDuration.addAndGet(duration);
+                                    latch.countDown();
+                                }
+                            });
+                        });
+            }
+        }
+
+        latch.await();
+        System.out.println("[멤버 티켓 최댓값에 맞게 계정별로 발행이 제한된다] : " + totalDuration.get() + " ms");
+
+        for (Member member : members) {
+            long issuedTicketCount = memberTicketRepository.countByMember(member);
+            assertThat(issuedTicketCount).isEqualTo(MemberTicket.MEMBER_TICKET_COUNT_MAX);
+        }
+    }
+
+    @Test
+    void 티켓_재고에_맞게_발행이_제한된다() throws InterruptedException {
+        Ticket ticket = ticketRepository.save(new Ticket("목성행", 10L));
+        int memberCount = 7;
+        int threadCount = memberCount * MemberTicket.MEMBER_TICKET_COUNT_MAX;
+        List<Member> members = IntStream.range(0, memberCount)
+                .mapToObj(memberOrder -> memberRepository.save(new Member("멤버" + memberOrder)))
+                .toList();
+
+        CountDownLatch latch = new CountDownLatch(threadCount);
+        AtomicLong totalDuration = new AtomicLong(0);
+        try (ExecutorService executorService = Executors.newFixedThreadPool(threadCount)) {
+            for (Member member : members) {
+                IntStream.range(0, MemberTicket.MEMBER_TICKET_COUNT_MAX)
+                        .forEach(ticketCount ->
+                                executorService.submit(() -> {
+                                    long startTime = System.currentTimeMillis();
+                                    try {
+                                        memberTicketService.issue(member.getId(), ticket.getId());
+                                    } finally {
+                                        long duration = System.currentTimeMillis() - startTime;
+                                        totalDuration.addAndGet(duration);
+                                        latch.countDown();
+                                    }
+                                })
+                        );
+            }
+        }
+
+        latch.await();
+        System.out.println("[티켓 재고에 맞게 발행이 제한된다]: " + totalDuration.get() + " ms");
+
+        assertThat(getTicketQuantity(ticket)).isEqualTo(0);
     }
 
     private Long getTicketQuantity(Ticket ticket) {
         return ticketRepository.findById(ticket.getId()).orElseThrow().getQuantity();
+    }
+
+    private Ticket getRandomTicket(Ticket... tickets) {
+        int ticketOrder = (int) (Math.random() * tickets.length);
+        return tickets[ticketOrder];
     }
 }
