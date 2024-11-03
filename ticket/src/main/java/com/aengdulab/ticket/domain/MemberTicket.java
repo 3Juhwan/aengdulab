@@ -4,7 +4,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -22,19 +21,17 @@ public class MemberTicket {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    private Member member;
+    private Long memberId;
 
-    @ManyToOne
-    private Ticket ticket;
+    private Long ticketId;
 
-    public MemberTicket(Member member, Ticket ticket) {
-        this(null, member, ticket);
+    public MemberTicket(Long memberId, Long ticketId) {
+        this(null, memberId, ticketId);
     }
 
-    public MemberTicket(Long id, Member member, Ticket ticket) {
+    public MemberTicket(Long id, Long memberId, Long ticketId) {
         this.id = id;
-        this.member = member;
-        this.ticket = ticket;
+        this.memberId = memberId;
+        this.ticketId = ticketId;
     }
 }

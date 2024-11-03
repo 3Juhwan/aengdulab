@@ -7,8 +7,6 @@ import com.aengdulab.ticket.repository.MemberRepository;
 import com.aengdulab.ticket.repository.MemberTicketRepository;
 import com.aengdulab.ticket.repository.TicketRepository;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.JDBCException;
-import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,17 +19,14 @@ public class MemberTicketService {
     private final TicketRepository ticketRepository;
     private final MemberTicketRepository memberTicketRepository;
 
-    @Retryable(
-            retryFor = {JDBCException.class},
-            maxAttempts = 10
-    )
     @Transactional
     public void issue(Long memberId, Long ticketId) {
         Member member = getMember(memberId);
         Ticket ticket = getTicket(ticketId);
         validateIssuable(member, ticket);
-        memberTicketRepository.save(new MemberTicket(member, ticket));
-        ticketRepository.decrementQuantity(ticketId);
+        memberTicketRepository.save(new MemberTicket(member.getId(), ticket.getId()));
+        ticket.decrementQuantity();
+//        ticketRepository.decrementQuantity(ticket.getId());
     }
 
     private Member getMember(Long memberId) {
@@ -48,9 +43,9 @@ public class MemberTicketService {
         if (!ticket.issuable()) {
             throw new IllegalArgumentException("티켓 재고가 소진되었습니다.");
         }
-        int issuedMemberTicketCount = memberTicketRepository.countByMember(member);
+        int issuedMemberTicketCount = memberTicketRepository.countByMemberId(member.getId());
         if (issuedMemberTicketCount >= MemberTicket.MEMBER_TICKET_COUNT_MAX) {
-            throw new IllegalArgumentException("계정당 구매할 수 있는 티켓 수량을 넘었습니다." + " memberId=" + member.getId());
+            throw new IllegalArgumentException("계정당 구매할 수 있는 티켓 수량을 넘었습니다.");
         }
     }
 }

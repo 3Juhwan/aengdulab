@@ -24,13 +24,3 @@ create table if not exists ticket
     name     varchar(255),
     primary key (id)
 ) engine = InnoDB;
-
-alter table member_ticket
-    add constraint FKomlguxfcardby8919wyyaxcw3
-        foreign key (member_id)
-            references member (id);
-
-alter table member_ticket
-    add constraint FK4ri79r4gubettxo63roi3ksfj
-        foreign key (ticket_id)
-            references ticket (id);
