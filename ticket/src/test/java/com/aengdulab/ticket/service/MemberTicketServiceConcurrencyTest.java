@@ -57,8 +57,13 @@ class MemberTicketServiceConcurrencyTest {
                 IntStream.range(0, MemberTicket.MEMBER_TICKET_COUNT_MAX)
                         .forEach(ticketCount ->
                                 executorService.submit(() -> {
-                                    memberTicketService.issue(member.getId(), ticket.getId());
-                                    latch.countDown();
+                                    try {
+                                        memberTicketService.issue(member.getId(), ticket.getId());
+                                    } catch (Exception e) {
+                                        System.out.println(e.getMessage());
+                                    } finally {
+                                        latch.countDown();
+                                    }
                                 })
                         );
             }
