@@ -15,6 +15,8 @@ import java.util.concurrent.Executors;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
@@ -22,6 +24,8 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
 @SuppressWarnings("NonAsciiCharacters")
 class MemberTicketServiceConcurrencyTest {
+
+    private Logger log = LoggerFactory.getLogger(MemberTicketServiceConcurrencyTest.class);
 
     @Autowired
     private MemberTicketService memberTicketService;
@@ -52,6 +56,7 @@ class MemberTicketServiceConcurrencyTest {
                 .toList();
 
         CountDownLatch latch = new CountDownLatch(threadCount);
+        long startTime = System.currentTimeMillis();
         try (ExecutorService executorService = Executors.newFixedThreadPool(threadCount)) {
             for (Member member : members) {
                 IntStream.range(0, MemberTicket.MEMBER_TICKET_COUNT_MAX)
@@ -60,7 +65,6 @@ class MemberTicketServiceConcurrencyTest {
                                     try {
                                         memberTicketService.issue(member.getId(), ticket.getId());
                                     } catch (Exception e) {
-                                        System.out.println(e.getMessage());
                                     } finally {
                                         latch.countDown();
                                     }
@@ -70,6 +74,8 @@ class MemberTicketServiceConcurrencyTest {
         }
 
         latch.await();
+        long endTime = System.currentTimeMillis();
+        log.info("[멤버 티켓 최댓값에 맞게 계정별로 발행이 제한된다] 수행 시간 : {}ms", (endTime - startTime));
 
         for (Member member : members) {
             long issuedTicketCount = memberTicketRepository.countByMember(member);
