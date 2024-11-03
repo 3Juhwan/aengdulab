@@ -42,7 +42,7 @@ public class MemberTicketService {
         if (!ticket.issuable()) {
             throw new IllegalArgumentException("티켓 재고가 소진되었습니다.");
         }
-        int issuedMemberTicketCount = memberTicketRepository.countByMemberAndTicket(member, ticket);
+        int issuedMemberTicketCount = memberTicketRepository.countByMember(member);
         if (issuedMemberTicketCount >= MemberTicket.MEMBER_TICKET_COUNT_MAX) {
             throw new IllegalArgumentException("계정당 구매할 수 있는 티켓 수량을 넘었습니다.");
         }

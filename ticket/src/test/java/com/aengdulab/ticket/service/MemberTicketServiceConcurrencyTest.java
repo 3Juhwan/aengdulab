@@ -67,7 +67,7 @@ class MemberTicketServiceConcurrencyTest {
         latch.await();
 
         for (Member member : members) {
-            long issuedTicketCount = memberTicketRepository.countByMemberAndTicket(member, ticket);
+            long issuedTicketCount = memberTicketRepository.countByMember(member);
             assertThat(issuedTicketCount).isEqualTo(MemberTicket.MEMBER_TICKET_COUNT_MAX);
         }
 
