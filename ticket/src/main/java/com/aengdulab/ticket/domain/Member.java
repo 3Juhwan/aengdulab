@@ -21,12 +21,27 @@ public class Member {
 
     private String name;
 
+    private Integer issuedTicketCount;
+
     public Member(String name) {
-        this(null, name);
+        this(null, name, 0);
     }
 
-    public Member(Long id, String name) {
+    public Member(String name, Integer issuedTicketCount) {
+        this(null, name, issuedTicketCount);
+    }
+
+    public Member(Long id, String name, Integer issuedTicketCount) {
         this.id = id;
         this.name = name;
+        this.issuedTicketCount = issuedTicketCount;
+    }
+
+    public void increaseIssuedTicketCount() {
+        issuedTicketCount++;
+    }
+
+    public boolean canIssueTicket() {
+        return issuedTicketCount < MemberTicket.MEMBER_TICKET_COUNT_MAX;
     }
 }

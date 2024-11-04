@@ -37,4 +37,8 @@ public class MemberTicket {
         this.member = member;
         this.ticket = ticket;
     }
+
+    public boolean issuable() {
+        return ticket.issuable() && member.canIssueTicket();
+    }
 }
