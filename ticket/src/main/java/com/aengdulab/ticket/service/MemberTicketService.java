@@ -29,12 +29,12 @@ public class MemberTicketService {
     }
 
     private Member getMember(Long memberId) {
-        return memberRepository.findById(memberId)
+        return memberRepository.findByIdForUpdate(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("멤버가 존재하지 않습니다."));
     }
 
     private Ticket getTicket(Long ticketId) {
-        return ticketRepository.findById(ticketId)
+        return ticketRepository.findByIdForUpdate(ticketId)
                 .orElseThrow(() -> new IllegalArgumentException("티켓이 존재하지 않습니다."));
     }
 
