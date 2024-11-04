@@ -41,8 +41,8 @@ class MemberTicketServiceTest {
     void 멤버_티켓_발행_제한_수를_초과하면_예외가_발생한다() {
         Member member = memberRepository.save(new Member("행성이"));
         Ticket ticket = ticketRepository.save(new Ticket("목성행", 5L));
-        memberTicketRepository.save(new MemberTicket(member, ticket));
-        memberTicketRepository.save(new MemberTicket(member, ticket));
+        memberTicketRepository.save(new MemberTicket(member.getId(), ticket.getId()));
+        memberTicketRepository.save(new MemberTicket(member.getId(), ticket.getId()));
 
         assertThatThrownBy(() -> memberTicketService.issue(member.getId(), ticket.getId()))
                 .isInstanceOf(IllegalArgumentException.class)

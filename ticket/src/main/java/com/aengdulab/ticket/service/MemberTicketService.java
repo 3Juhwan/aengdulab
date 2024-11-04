@@ -32,7 +32,7 @@ public class MemberTicketService {
         Member member = getMember(memberId);
         Ticket ticket = getTicket(ticketId);
         validateIssuable(member, ticket);
-        memberTicketRepository.save(new MemberTicket(member, ticket));
+        memberTicketRepository.save(new MemberTicket(member.getId(), ticket.getId()));
         ticket.decrementQuantity();
     }
 
@@ -50,7 +50,7 @@ public class MemberTicketService {
         if (!ticket.issuable()) {
             throw new IllegalArgumentException("티켓 재고가 소진되었습니다.");
         }
-        int issuedMemberTicketCount = memberTicketRepository.countByMember(member);
+        int issuedMemberTicketCount = memberTicketRepository.countByMemberId(member.getId());
         if (issuedMemberTicketCount >= MemberTicket.MEMBER_TICKET_COUNT_MAX) {
             throw new IllegalArgumentException("계정당 구매할 수 있는 티켓 수량을 넘었습니다.");
         }

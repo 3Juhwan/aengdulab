@@ -78,7 +78,7 @@ class MemberTicketServiceConcurrencyTest {
         log.info("[멤버 티켓 최댓값에 맞게 계정별로 발행이 제한된다] 수행 시간 : {}ms", (endTime - startTime));
 
         for (Member member : members) {
-            long issuedTicketCount = memberTicketRepository.countByMember(member);
+            long issuedTicketCount = memberTicketRepository.countByMemberId(member.getId());
             assertThat(issuedTicketCount).isEqualTo(MemberTicket.MEMBER_TICKET_COUNT_MAX);
         }
 
@@ -114,7 +114,7 @@ class MemberTicketServiceConcurrencyTest {
         long endTime = System.currentTimeMillis();
         log.info("[멤버 티켓 최댓값에 맞게 계정별로 발행이 제한된다] 수행 시간 : {}ms", (endTime - startTime));
         for (Member member : members) {
-            long issuedTicketCount = memberTicketRepository.countByMember(member);
+            long issuedTicketCount = memberTicketRepository.countByMemberId(member.getId());
             assertThat(issuedTicketCount).isLessThanOrEqualTo(MemberTicket.MEMBER_TICKET_COUNT_MAX);
         }
         assertThat(getTicketQuantity(ticket)).isEqualTo(0);
@@ -153,7 +153,7 @@ class MemberTicketServiceConcurrencyTest {
         long endTime = System.currentTimeMillis();
         log.info("[멤버 티켓 최댓값에 맞게 계정별로 발행이 제한된다] 수행 시간 : {}ms", (endTime - startTime));
         for (Member member : members) {
-            long issuedTicketCount = memberTicketRepository.countByMember(member);
+            long issuedTicketCount = memberTicketRepository.countByMemberId(member.getId());
             assertThat(issuedTicketCount).isEqualTo(MemberTicket.MEMBER_TICKET_COUNT_MAX);
         }
     }
