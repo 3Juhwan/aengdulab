@@ -7,6 +7,9 @@ import com.aengdulab.ticket.repository.MemberRepository;
 import com.aengdulab.ticket.repository.MemberTicketRepository;
 import com.aengdulab.ticket.repository.TicketRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataAccessException;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +22,11 @@ public class MemberTicketService {
     private final TicketRepository ticketRepository;
     private final MemberTicketRepository memberTicketRepository;
 
+    @Retryable(
+            retryFor = {DataAccessException.class},
+            maxAttempts = 10,
+            backoff = @Backoff(delay = 1000, multiplier = 2, random = true)
+    )
     @Transactional
     public void issue(Long memberId, Long ticketId) {
         Member member = getMember(memberId);

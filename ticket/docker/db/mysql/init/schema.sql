@@ -21,6 +21,7 @@ create table if not exists ticket
 (
     id       bigint not null auto_increment,
     quantity bigint,
+    version  bigint,
     name     varchar(255),
     primary key (id)
 ) engine = InnoDB;

@@ -4,6 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Version;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -22,6 +23,9 @@ public class Ticket {
     private String name;
 
     private Long quantity;
+
+    @Version
+    private Long version;
 
     public Ticket(String name, Long quantity) {
         this(null, name, quantity);
