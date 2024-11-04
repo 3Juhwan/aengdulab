@@ -43,3 +43,22 @@ public class MemberTicketService {
 수행 시간1 : 11799ms
 수행 시간2 : 11732ms
 수행 시간3 : 11740ms
+
+### version 필드 추가 + 외래키 제거
+
+```java
+public class MemberTicket {
+
+    private Long memberId;
+
+    private Long ticketId;
+}
+``` 
+
+티켓 100개, 멤버 60명 동시 요청
+
+수행 시간1: 11502ms
+수행 시간2: 12425ms
+수행 시간3: 11169ms
+
+- 더이상 데드락은 발생하지 않지만, 수행 시간에 유의미한 차이는 없다.  
