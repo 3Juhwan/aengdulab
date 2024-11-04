@@ -9,6 +9,13 @@ Ticket 엔티티의 quantity 필드에 낙관락을 건다.
 - @Version을 일반적으로 사용하기 어렵고 별도의 로직을 작성해야 한다. 
 - 또는, 새로운 version을 위한 필드를 추가해도 된다. 
 
+### Hibernate의 @Version 로직 가로채기
+
+- Hibernate의 Event Listener 또는 Entity Listener를 커스텀하여 @Version의 로직을 가로챌 수 있다.
+- 하지만 이는 비표준 방식이고, 예측 불가능한 코드를 만든다. 
+- 애플리케이션 레벨에서 낙관락을 구현할 수 있다. 하지만 코드가 복잡해지고, 신뢰하기 어려운 로직이다. 
+- 또한, 낙관락으로 동시성 문제를 완전히 해결할 수 없다. 
+
 ### version 필드 추가
 
 ```java
