@@ -20,7 +20,7 @@ public class MemberTicketService {
     private final MemberTicketRepository memberTicketRepository;
 
     @Transactional
-    public void issue(Long memberId, Long ticketId) {
+    public synchronized void issue(Long memberId, Long ticketId) {
         Member member = getMember(memberId);
         Ticket ticket = getTicket(ticketId);
         validateIssuable(member, ticket);
@@ -34,7 +34,7 @@ public class MemberTicketService {
     }
 
     private Ticket getTicket(Long ticketId) {
-        return ticketRepository.findById(ticketId)
+        return ticketRepository.findByIdWithLock(ticketId)
                 .orElseThrow(() -> new IllegalArgumentException("티켓이 존재하지 않습니다."));
     }
 
@@ -42,7 +42,7 @@ public class MemberTicketService {
         if (!ticket.issuable()) {
             throw new IllegalArgumentException("티켓 재고가 소진되었습니다.");
         }
-        int issuedMemberTicketCount = memberTicketRepository.countByMember(member);
+        int issuedMemberTicketCount = memberTicketRepository.findAllByMemberWithLock(member).size();
         if (issuedMemberTicketCount >= MemberTicket.MEMBER_TICKET_COUNT_MAX) {
             throw new IllegalArgumentException("계정당 구매할 수 있는 티켓 수량을 넘었습니다.");
         }
