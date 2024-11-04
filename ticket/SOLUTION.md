@@ -2,7 +2,39 @@
 
 ## 풀이 방법 - 비관락
 
-적절하게 비관락을 사용하여 풀이하면 된다.
+적절하게 비관락을 사용하여 풀이하면 된다.  
+
+- 비관락은 데드락 발생 가능성이 있으므로, 사용 시 주의해야 한다.
+- 다중 DBMS 환경에서는 비관락을 사용할 수 없는 경우도 있다.
+
+### 비관락
+
+```java
+
+@Repository
+public interface MemberRepository extends JpaRepository<Member, Long> {
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select m from Member m where m.id = :memberId")
+    Optional<Member> findByIdForUpdate(Long memberId);
+}
+
+@Repository
+public interface TicketRepository extends JpaRepository<Ticket, Long> {
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select t from Ticket t where t.id = :ticketId")
+    Optional<Ticket> findByIdForUpdate(Long ticketId);
+}
+```
+
+- 멤버와 티켓 조회 시에 비관락을 사용한다. 각 멤버와 티켓에 대한 동시성이 보장된다.  
+
+티켓 100개, 멤버 60명 동시 요청
+
+실행 시간1: 376ms  
+실행 시간2: 569ms  
+실행 시간3: 381ms  
 
 ### 비관락 + synchronized
 
