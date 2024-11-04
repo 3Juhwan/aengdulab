@@ -34,7 +34,7 @@ public class MemberTicketService {
     }
 
     private Ticket getTicket(Long ticketId) {
-        return ticketRepository.findById(ticketId)
+        return ticketRepository.findByIdForUpdate(ticketId)
                 .orElseThrow(() -> new IllegalArgumentException("티켓이 존재하지 않습니다."));
     }
 
