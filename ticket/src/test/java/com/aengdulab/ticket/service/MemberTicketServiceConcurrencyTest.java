@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -53,16 +52,13 @@ class MemberTicketServiceConcurrencyTest {
                 .toList();
 
         CountDownLatch latch = new CountDownLatch(threadCount);
-        AtomicLong totalDuration = new AtomicLong(0);
+        long startTime = System.currentTimeMillis();
         try (ExecutorService executorService = Executors.newFixedThreadPool(threadCount)) {
             for (Member member : members) {
                 IntStream.range(0, MemberTicket.MEMBER_TICKET_COUNT_MAX)
                         .forEach(ticketCount ->
                                 executorService.submit(() -> {
-                                    long startTime = System.currentTimeMillis();
                                     memberTicketService.issue(member.getId(), ticket.getId());
-                                    long duration = System.currentTimeMillis() - startTime;
-                                    totalDuration.addAndGet(duration);
                                     latch.countDown();
                                 })
                         );
@@ -70,7 +66,8 @@ class MemberTicketServiceConcurrencyTest {
         }
 
         latch.await();
-        System.out.println("[멤버 티켓을 발행하면 티켓 재고가 올바르게 수정된다]: " + totalDuration.get() + " ms");
+        long endTime = System.currentTimeMillis();
+        System.out.println("[멤버 티켓을 발행하면 티켓 재고가 올바르게 수정된다]: " + (endTime - startTime) +  " ms");
 
         for (Member member : members) {
             long issuedTicketCount = memberTicketRepository.countByMember(member);
@@ -93,19 +90,16 @@ class MemberTicketServiceConcurrencyTest {
 
 
         CountDownLatch latch = new CountDownLatch(threadCount);
-        AtomicLong totalDuration = new AtomicLong(0);
+        long startTime = System.currentTimeMillis();
         try (ExecutorService executorService = Executors.newFixedThreadPool(threadCount)) {
             for (Member member : members) {
                 IntStream.range(0, ticketIssueCount)
                         .forEach(ticketCount -> {
                             Long ticketId = getRandomTicket(jupiterTicket, marsTicket).getId();
                             executorService.submit(() -> {
-                                long startTime = System.currentTimeMillis();
                                 try {
                                     memberTicketService.issue(member.getId(), ticketId);
                                 } finally {
-                                    long duration = System.currentTimeMillis() - startTime;
-                                    totalDuration.addAndGet(duration);
                                     latch.countDown();
                                 }
                             });
@@ -114,7 +108,8 @@ class MemberTicketServiceConcurrencyTest {
         }
 
         latch.await();
-        System.out.println("[멤버 티켓 최댓값에 맞게 계정별로 발행이 제한된다] : " + totalDuration.get() + " ms");
+        long endTime = System.currentTimeMillis();
+        System.out.println("[멤버 티켓 최댓값에 맞게 계정별로 발행이 제한된다] : " + (endTime - startTime) + " ms");
 
         for (Member member : members) {
             long issuedTicketCount = memberTicketRepository.countByMember(member);
@@ -132,18 +127,15 @@ class MemberTicketServiceConcurrencyTest {
                 .toList();
 
         CountDownLatch latch = new CountDownLatch(threadCount);
-        AtomicLong totalDuration = new AtomicLong(0);
+        long startTime = System.currentTimeMillis();
         try (ExecutorService executorService = Executors.newFixedThreadPool(threadCount)) {
             for (Member member : members) {
                 IntStream.range(0, MemberTicket.MEMBER_TICKET_COUNT_MAX)
                         .forEach(ticketCount ->
                                 executorService.submit(() -> {
-                                    long startTime = System.currentTimeMillis();
                                     try {
                                         memberTicketService.issue(member.getId(), ticket.getId());
                                     } finally {
-                                        long duration = System.currentTimeMillis() - startTime;
-                                        totalDuration.addAndGet(duration);
                                         latch.countDown();
                                     }
                                 })
@@ -152,7 +144,8 @@ class MemberTicketServiceConcurrencyTest {
         }
 
         latch.await();
-        System.out.println("[티켓 재고에 맞게 발행이 제한된다]: " + totalDuration.get() + " ms");
+        long endTime = System.currentTimeMillis();
+        System.out.println("[티켓 재고에 맞게 발행이 제한된다]: " + (endTime - startTime) + " ms");
 
         assertThat(getTicketQuantity(ticket)).isEqualTo(0);
     }
