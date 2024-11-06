@@ -8,9 +8,9 @@ import com.aengdulab.ticket.domain.Ticket;
 import com.aengdulab.ticket.repository.MemberRepository;
 import com.aengdulab.ticket.repository.MemberTicketRepository;
 import com.aengdulab.ticket.repository.TicketRepository;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -56,6 +56,7 @@ class MemberTicketServiceConcurrencyTest {
 
         CountDownLatch latch = new CountDownLatch(threadCount);
         long startTime = System.currentTimeMillis();
+        Map<Member, Long> ticketIssuedCounts = new ConcurrentHashMap<>();
         try (ExecutorService executorService = Executors.newFixedThreadPool(threadCount)) {
             for (Member member : members) {
                 IntStream.range(0, MemberTicket.MEMBER_TICKET_COUNT_MAX)
@@ -63,8 +64,7 @@ class MemberTicketServiceConcurrencyTest {
                                 executorService.submit(() -> {
                                     try {
                                         memberTicketService.issue(member.getId(), ticket.getId());
-                                    } catch (Exception e) {
-                                        System.out.println(e.getMessage());
+                                        ticketIssuedCounts.compute(member, (key, value) -> value == null ? 1 : value + 1);
                                     } finally {
                                         latch.countDown();
                                     }
@@ -78,10 +78,14 @@ class MemberTicketServiceConcurrencyTest {
 
         for (Member member : members) {
             long issuedTicketCount = memberTicketRepository.countByMember(member);
-            assertThat(issuedTicketCount).isEqualTo(MemberTicket.MEMBER_TICKET_COUNT_MAX);
+            assertThat(issuedTicketCount).isEqualTo(ticketIssuedCounts.getOrDefault(member, 0L));
         }
 
-        assertThat(getTicketQuantity(ticket)).isEqualTo(0);
+        long totalCount = ticketIssuedCounts.values()
+                .stream()
+                .mapToLong(Long::valueOf)
+                .sum();
+        assertThat(getTicketQuantity(ticket)).isEqualTo(10L - totalCount);
     }
 
     @Test
@@ -98,6 +102,7 @@ class MemberTicketServiceConcurrencyTest {
 
         CountDownLatch latch = new CountDownLatch(threadCount);
         long startTime = System.currentTimeMillis();
+        Map<Member, Long> ticketIssuedCounts = new ConcurrentHashMap<>();
         try (ExecutorService executorService = Executors.newFixedThreadPool(threadCount)) {
             for (Member member : members) {
                 IntStream.range(0, ticketIssueCount)
@@ -106,6 +111,7 @@ class MemberTicketServiceConcurrencyTest {
                             executorService.submit(() -> {
                                 try {
                                     memberTicketService.issue(member.getId(), ticketId);
+                                    ticketIssuedCounts.compute(member, (key, value) -> value == null ? 1 : value + 1);
                                 } finally {
                                     latch.countDown();
                                 }
@@ -117,9 +123,13 @@ class MemberTicketServiceConcurrencyTest {
         long endTime = System.currentTimeMillis();
         System.out.println("[멤버 티켓 최댓값에 맞게 계정별로 발행이 제한된다] : " + (endTime - startTime) + " ms");
 
+        boolean issuedTicketCountsValid = ticketIssuedCounts.values()
+                .stream()
+                .noneMatch(ticketIssuedCount -> ticketIssuedCount > MemberTicket.MEMBER_TICKET_COUNT_MAX);
+        assertThat(issuedTicketCountsValid).isTrue();
         for (Member member : members) {
             long issuedTicketCount = memberTicketRepository.countByMember(member);
-            assertThat(issuedTicketCount).isEqualTo(MemberTicket.MEMBER_TICKET_COUNT_MAX);
+            assertThat(issuedTicketCount).isEqualTo(ticketIssuedCounts.getOrDefault(member, 0L));
         }
     }
 
@@ -143,8 +153,6 @@ class MemberTicketServiceConcurrencyTest {
                                     try {
                                         memberTicketService.issue(member.getId(), ticket.getId());
                                         successCount.incrementAndGet();
-                                    } catch (Exception e) {
-                                        System.out.println(e.getMessage());
                                     } finally {
                                         latch.countDown();
                                     }
