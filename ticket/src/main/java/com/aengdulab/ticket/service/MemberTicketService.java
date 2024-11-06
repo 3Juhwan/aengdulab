@@ -7,6 +7,9 @@ import com.aengdulab.ticket.repository.MemberRepository;
 import com.aengdulab.ticket.repository.MemberTicketRepository;
 import com.aengdulab.ticket.repository.TicketRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +23,11 @@ public class MemberTicketService {
     private final MemberTicketRepository memberTicketRepository;
 
     @Transactional
+    @Retryable(
+            retryFor = { ObjectOptimisticLockingFailureException.class },
+            maxAttempts = 5,
+            backoff =  @Backoff(delayExpression = "T(java.lang.Math).random() * 500 + 300")
+    )
     public void issue(Long memberId, Long ticketId) {
         Member member = getMember(memberId);
         Ticket ticket = getTicket(ticketId);
@@ -34,7 +42,7 @@ public class MemberTicketService {
     }
 
     private Ticket getTicket(Long ticketId) {
-        return ticketRepository.findById(ticketId)
+        return ticketRepository.findByIdWithLock(ticketId)
                 .orElseThrow(() -> new IllegalArgumentException("티켓이 존재하지 않습니다."));
     }
 
