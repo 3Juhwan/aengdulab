@@ -25,8 +25,8 @@ public class MemberTicketService {
     @Transactional
     @Retryable(
             retryFor = { ObjectOptimisticLockingFailureException.class },
-            maxAttempts = 5,
-            backoff =  @Backoff(delayExpression = "T(java.lang.Math).random() * 500 + 300")
+            maxAttempts = 10,
+            backoff =  @Backoff(delayExpression = "T(java.lang.Math).random() * 1000 + 200")
     )
     public void issue(Long memberId, Long ticketId) {
         Member member = getMember(memberId);
@@ -37,7 +37,7 @@ public class MemberTicketService {
     }
 
     private Member getMember(Long memberId) {
-        return memberRepository.findById(memberId)
+        return memberRepository.findByIdWithLock(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("멤버가 존재하지 않습니다."));
     }
 

@@ -6,6 +6,7 @@ create table if not exists member
 (
     id   bigint not null auto_increment,
     name varchar(255),
+    version bigint,
     primary key (id)
 ) engine = InnoDB;
 
