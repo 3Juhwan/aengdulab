@@ -12,3 +12,8 @@ spring:
         format_sql: true
         show_sql: true
         hbm2ddl.auto: validate
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
