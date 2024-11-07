@@ -1,5 +1,6 @@
 package com.aengdulab.ticket.service;
 
+import com.aengdulab.ticket.annotation.TransactionalLock;
 import com.aengdulab.ticket.domain.Member;
 import com.aengdulab.ticket.domain.MemberTicket;
 import com.aengdulab.ticket.domain.Ticket;
@@ -8,10 +9,8 @@ import com.aengdulab.ticket.repository.MemberTicketRepository;
 import com.aengdulab.ticket.repository.TicketRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class MemberTicketService {
 
@@ -19,7 +18,7 @@ public class MemberTicketService {
     private final TicketRepository ticketRepository;
     private final MemberTicketRepository memberTicketRepository;
 
-    @Transactional
+    @TransactionalLock(value = {"issuedTicket:memberId:%d", "issuedTicket:ticketId:%d"})
     public void issue(Long memberId, Long ticketId) {
         Member member = getMember(memberId);
         Ticket ticket = getTicket(ticketId);
