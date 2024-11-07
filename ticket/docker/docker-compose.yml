@@ -15,3 +15,9 @@ services:
     volumes:
       - ./db/mysql/data:/var/lib/mysql
       - ./db/mysql/init/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379"
