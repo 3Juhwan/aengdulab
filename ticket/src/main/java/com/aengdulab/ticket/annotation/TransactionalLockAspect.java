@@ -22,40 +22,22 @@ public class TransactionalLockAspect {
     @Around("@annotation(transactionalLock)")
     public Object handleLockRelease(ProceedingJoinPoint joinPoint, TransactionalLock transactionalLock)
             throws Throwable {
-
-        String[] lockKeys = transactionalLock.value();
-        RLock[] locks = new RLock[lockKeys.length];
-        Object[] args = joinPoint.getArgs();
-        for (int i = 0; i < locks.length; i++) {
-            String lockKey = String.format(lockKeys[i], args[i]);
-            locks[i] = redissonClient.getLock(lockKey);
-        }
+        RLock[] locks = getLocks(joinPoint, transactionalLock);
+        RedissonMultiLock multiLock = new RedissonMultiLock(locks);
 
         boolean isLockAcquired = true;
         try {
             for (int attempt = 0; attempt < 10; attempt++) {
-                isLockAcquired = true;
-                RedissonMultiLock multiLock = new RedissonMultiLock(locks);
-                try {
-                    if (multiLock.tryLock(5, 100, TimeUnit.SECONDS)) {
-                        break;
-                    } else {
-                        throw new IllegalStateException("!!!!!!!");
-                    }
-                } catch (Exception e) {
-                    isLockAcquired = false;
-                    for (RLock lock : locks) {
-                        if (lock.isHeldByCurrentThread()) {
-                            lock.unlock();
-                        }
-                    }
-                    System.out.println("Lock acquisition failed, retrying...");
-                    Thread.sleep(1000);
+                isLockAcquired = acquireLock(multiLock);
+                if (isLockAcquired) {
+                    break;
                 }
+                multiLock.unlock();
+                Thread.sleep(1000);
             }
 
             if (!isLockAcquired) {
-                throw new RuntimeException("Lock acquisition failed after multiple attempts");
+                throw new RuntimeException("락 획득 실패");
             }
 
             return transactionTemplate.execute(status -> {
@@ -68,11 +50,27 @@ public class TransactionalLockAspect {
         } catch (ThrownException e) {
             throw e.getCause();
         } finally {
-            for (RLock lock : locks) {
-                if (lock.isHeldByCurrentThread()) {
-                    lock.unlock();
-                }
-            }
+            multiLock.unlock();
         }
+    }
+
+    private boolean acquireLock(RedissonMultiLock multiLock) {
+        try {
+            return multiLock.tryLock(5, 100, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private RLock[] getLocks(ProceedingJoinPoint joinPoint, TransactionalLock transactionalLock) {
+        String[] lockKeys = transactionalLock.value();
+        RLock[] locks = new RLock[lockKeys.length];
+        Object[] args = joinPoint.getArgs();
+        for (int i = 0; i < locks.length; i++) {
+            String lockKey = String.format(lockKeys[i], args[i]);
+            locks[i] = redissonClient.getLock(lockKey);
+        }
+
+        return locks;
     }
 }
