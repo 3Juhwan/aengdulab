@@ -32,7 +32,6 @@ public class TransactionalLockAspect {
                 if (isLockAcquired) {
                     break;
                 }
-                multiLock.unlock();
                 Thread.sleep(1000);
             }
 
