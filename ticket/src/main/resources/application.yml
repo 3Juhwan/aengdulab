@@ -4,6 +4,8 @@ spring:
     url: jdbc:mysql://localhost:13306/ticket?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
     username: root
     password: root
+    hikari:
+      maximum-pool-size: 100
 
   jpa:
     properties:

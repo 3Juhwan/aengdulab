@@ -8,6 +8,7 @@ import com.aengdulab.ticket.repository.MemberTicketRepository;
 import com.aengdulab.ticket.repository.TicketRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -19,8 +20,8 @@ public class MemberTicketService {
     private final TicketRepository ticketRepository;
     private final MemberTicketRepository memberTicketRepository;
 
-    @Transactional
-    public void issue(Long memberId, Long ticketId) {
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void  issue(Long memberId, Long ticketId) {
         Member member = getMember(memberId);
         Ticket ticket = getTicket(ticketId);
         validateIssuable(member, ticket);
