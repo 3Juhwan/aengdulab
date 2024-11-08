@@ -11,20 +11,21 @@ import org.springframework.context.annotation.Primary;
 @Configuration
 public class DataSourceConfig {
 
-    @ConfigurationProperties(prefix = "ticket.datasource.primary")
+    private static final String PRIMARY_DATASOURCE = "ticket.datasource.primary";
+    private static final String LOCK_DATASOURCE = "ticket.datasource.lock";
+
+    @ConfigurationProperties(prefix = PRIMARY_DATASOURCE)
     @Primary
     @Bean
     public DataSource primaryDataSource() {
-        System.out.println("DataSourceConfig.primaryDataSource");
         return DataSourceBuilder.create()
                 .type(HikariDataSource.class)
                 .build();
     }
 
-    @ConfigurationProperties(prefix = "ticket.datasource.lock")
+    @ConfigurationProperties(prefix = LOCK_DATASOURCE)
     @Bean
     public DataSource lockDataSource() {
-        System.out.println("DataSourceConfig.lockDataSource");
         return DataSourceBuilder.create()
                 .type(HikariDataSource.class)
                 .build();
