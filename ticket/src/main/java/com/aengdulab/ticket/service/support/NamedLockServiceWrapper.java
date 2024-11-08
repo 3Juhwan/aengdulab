@@ -5,22 +5,21 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import javax.sql.DataSource;
-import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class NamedLockServiceWrapper {
-
-    private Logger logger = LoggerFactory.getLogger(NamedLockServiceWrapper.class);
 
     private static final String GET_LOCK_SQL = "select get_lock(?, ?)";
     private static final String RELEASE_LOCK_SQL = "select release_lock(?)";
     private static final int LOCK_TIMEOUT = 1000;
 
     private final DataSource dataSource;
+
+    public NamedLockServiceWrapper(@Qualifier("lockDataSource") DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
 
     public void executeInNamedLock(String lockName, Runnable runnable) {
         try (Connection connection = dataSource.getConnection()) {
