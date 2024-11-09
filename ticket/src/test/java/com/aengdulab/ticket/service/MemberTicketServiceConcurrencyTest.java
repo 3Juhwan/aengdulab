@@ -8,10 +8,11 @@ import com.aengdulab.ticket.domain.Ticket;
 import com.aengdulab.ticket.repository.MemberRepository;
 import com.aengdulab.ticket.repository.MemberTicketRepository;
 import com.aengdulab.ticket.repository.TicketRepository;
+import com.aengdulab.ticket.support.TimeMeasure;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,7 +26,7 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 @SuppressWarnings("NonAsciiCharacters")
 class MemberTicketServiceConcurrencyTest {
 
-    private Logger log = LoggerFactory.getLogger(MemberTicketServiceConcurrencyTest.class);
+    private static final Logger log = LoggerFactory.getLogger(MemberTicketServiceConcurrencyTest.class);
 
     @Autowired
     private MemberTicketService memberTicketService;
@@ -47,46 +48,110 @@ class MemberTicketServiceConcurrencyTest {
     }
 
     @Test
-    void 동시에_여러_멤버_티켓을_발행할_때_티켓_재고가_올바르게_수정된다() throws InterruptedException {
-        Ticket ticket = ticketRepository.save(new Ticket("목성행", 10L));
+    void 동시_티켓_발행에서_멤버당_발급_제한과_재고_감소의_정합성을_검증한다() {
+        int ticketQuantity = 10;
         int memberCount = 5;
-        int threadCount = memberCount * MemberTicket.MEMBER_TICKET_COUNT_MAX;
-        List<Member> members = IntStream.range(0, memberCount)
-                .mapToObj(memberOrder -> memberRepository.save(new Member("test" + memberOrder)))
-                .toList();
+        Ticket ticket = createTicket("목성행", ticketQuantity);
+        List<Member> members = createMembers(memberCount);
 
-        CountDownLatch latch = new CountDownLatch(threadCount);
-        long startTime = System.currentTimeMillis();
-        try (ExecutorService executorService = Executors.newFixedThreadPool(threadCount)) {
-            for (Member member : members) {
-                IntStream.range(0, MemberTicket.MEMBER_TICKET_COUNT_MAX)
-                        .forEach(ticketCount ->
-                                executorService.submit(() -> {
-                                    try {
-                                        memberTicketService.issue(member.getId(), ticket.getId());
-                                    } catch (Exception e) {
-                                    } finally {
-                                        latch.countDown();
-                                    }
-                                })
-                        );
+        int threadCount = memberCount * MemberTicket.MEMBER_TICKET_COUNT_MAX;
+        TimeMeasure.measureTime(() -> {
+            try (ExecutorService executorService = Executors.newFixedThreadPool(threadCount)) {
+                sendMultipleRequests(executorService, members, ticket);
+            }
+        });
+
+        assertThat(getTicketQuantity(ticket)).isEqualTo(0);
+        for (Member member : members) {
+            assertThat(getMemberTicketCount(member)).isEqualTo(MemberTicket.MEMBER_TICKET_COUNT_MAX);
+        }
+    }
+
+    @Test
+    void 멤버당_티켓_발급_제한을_초과하는_요청_시_정상_처리_여부를_검증한다() {
+        int ticketQuantity = 30;
+        int memberCount = 5;
+        int ticketIssueCount = 3 * MemberTicket.MEMBER_TICKET_COUNT_MAX;
+        Ticket jupiterTicket = createTicket("목성행", ticketQuantity);
+        Ticket marsTicket = createTicket("화성행", ticketQuantity);
+        List<Member> members = createMembers(memberCount);
+
+        int threadCount = memberCount * ticketIssueCount;
+        TimeMeasure.measureTime(() -> {
+            try (ExecutorService executorService = Executors.newFixedThreadPool(threadCount)) {
+                sendMultipleRequests(executorService, members, jupiterTicket, marsTicket);
+            }
+        });
+
+        assertThat(getTicketQuantity(jupiterTicket)).isGreaterThanOrEqualTo(0);
+        assertThat(getTicketQuantity(marsTicket)).isGreaterThanOrEqualTo(0);
+        for (Member member : members) {
+            assertThat(getMemberTicketCount(member)).isEqualTo(MemberTicket.MEMBER_TICKET_COUNT_MAX);
+        }
+    }
+
+    @Test
+    void 티켓당_재고_제한_초과하는_요청_시_정상_처리_여부를_검증한다() {
+        int ticketQuantity = 10;
+        int memberCount = 10;
+        Ticket ticket = createTicket("목성행", ticketQuantity);
+        List<Member> members = createMembers(memberCount);
+
+        int threadCount = memberCount * MemberTicket.MEMBER_TICKET_COUNT_MAX;
+        TimeMeasure.measureTime(() -> {
+            try (ExecutorService executorService = Executors.newFixedThreadPool(threadCount)) {
+                sendMultipleRequests(executorService, members, ticket);
+            }
+        });
+
+        assertThat(getTicketQuantity(ticket)).isEqualTo(0);
+        for (Member member : members) {
+            assertThat(getMemberTicketCount(member)).isLessThanOrEqualTo(MemberTicket.MEMBER_TICKET_COUNT_MAX);
+        }
+    }
+
+    private void sendMultipleRequests(ExecutorService executorService, List<Member> members, Ticket... tickets) {
+        AtomicInteger succeedRequestCount = new AtomicInteger(0);
+        AtomicInteger failRequestCount = new AtomicInteger(0);
+
+        for (Member member : members) {
+            for (int i = 0; i < MemberTicket.MEMBER_TICKET_COUNT_MAX; i++) {
+                executorService.submit(() -> {
+                    try {
+                        memberTicketService.issue(member.getId(), getRandomTicket(tickets).getId());
+                        succeedRequestCount.incrementAndGet();
+                    } catch (Exception e) {
+                        log.error("멤버 티켓 발행 중 오류 발생", e);
+                        failRequestCount.incrementAndGet();
+                    }
+                });
             }
         }
 
-        latch.await();
-        long endTime = System.currentTimeMillis();
-        log.info("[멤버 티켓 최댓값에 맞게 계정별로 발행이 제한된다] 수행 시간 : {}ms", (endTime - startTime));
-
-        for (Member member : members) {
-            long issuedTicketCount = memberTicketRepository.countByMember(member);
-            assertThat(issuedTicketCount).isEqualTo(MemberTicket.MEMBER_TICKET_COUNT_MAX);
-        }
-
-        assertThat(getTicketQuantity(ticket)).isEqualTo(0);
-        assertThat(ticket.getQuantity()).isEqualTo(0);
+        log.info("성공한 요청 수 : {}", succeedRequestCount.get());
+        log.info("실패한 요청 수 : {}", failRequestCount.get());
     }
 
-    private Long getTicketQuantity(Ticket ticket) {
+    private Ticket getRandomTicket(Ticket... tickets) {
+        int ticketOrder = (int) (Math.random() * tickets.length);
+        return tickets[ticketOrder];
+    }
+
+    private long getTicketQuantity(Ticket ticket) {
         return ticketRepository.findById(ticket.getId()).orElseThrow().getQuantity();
+    }
+
+    private int getMemberTicketCount(Member member) {
+        return memberTicketRepository.countByMember(member);
+    }
+
+    private Ticket createTicket(String ticketName, long quantity) {
+        return ticketRepository.save(new Ticket(ticketName, quantity));
+    }
+
+    private List<Member> createMembers(int memberCount) {
+        return IntStream.range(0, memberCount)
+                .mapToObj(sequence -> memberRepository.save(new Member("멤버" + sequence)))
+                .toList();
     }
 }
