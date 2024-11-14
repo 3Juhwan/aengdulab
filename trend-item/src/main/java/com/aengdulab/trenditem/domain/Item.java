@@ -4,6 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -75,5 +76,9 @@ public class Item {
 
     public int getContentLength() {
         return content.length();
+    }
+
+    public Long calculateElapsedMinutes(LocalDateTime comparisonTime) {
+        return Duration.between(postedAt, comparisonTime).toMinutes();
     }
 }

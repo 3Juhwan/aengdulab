@@ -16,20 +16,21 @@ public class TrendItem implements Comparable<TrendItem> {
     private final Item item;
     private final Long comments;
     private final Long likes;
+    private final LocalDateTime now;
 
-    public TrendItem(Item item, Long comments, Long likes) {
+    public TrendItem(Item item, Long comments, Long likes, LocalDateTime now) {
         this.item = item;
         this.comments = comments;
         this.likes = likes;
+        this.now = now;
     }
 
     public double calculatePopularity() {
-        long elapsedTime = Duration.between(item.getPostedAt(), LocalDateTime.now()).toMinutes();
         return (comments * COMMENT_WEIGHT) +
                 (likes * LIKE_WEIGHT) +
                 (item.getViews() * VIEW_WEIGHT) +
                 (item.getContentLength() * CONTENT_LENGTH_WEIGHT) -
-                (elapsedTime * ELAPSED_TIME_WEIGHT);
+                (item.calculateElapsedMinutes(now) * ELAPSED_TIME_WEIGHT);
     }
 
     @Override

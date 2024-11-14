@@ -45,6 +45,6 @@ public class ItemService {
         Long comments = commentRepository.countByItem(item);
         Long likes = likeRepository.countByItem(item);
 
-        return new TrendItem(item, comments, likes);
+        return new TrendItem(item, comments, likes, LocalDateTime.now(clock));
     }
 }
