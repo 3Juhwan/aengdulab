@@ -1,5 +1,6 @@
 package com.aengdulab.trenditem.domain;
 
+import java.util.ArrayList;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -25,7 +26,7 @@ public class TrendItemsTest {
     }
 
     @Test
-    public void testGetItems() {
+    public void 인기_점수_기준으로_정렬한다() {
         TrendItem trendItem1 = new TrendItem(item1, 10L, 15L, NOW);
         TrendItem trendItem2 = new TrendItem(item2, 5L, 20L, NOW);
         TrendItem trendItem3 = new TrendItem(item3, 10L, 15L, NOW);
@@ -41,5 +42,19 @@ public class TrendItemsTest {
         assertThat(items.get(1).getTitle()).isEqualTo("Item 4");
         assertThat(items.get(2).getTitle()).isEqualTo("Item 1");
         assertThat(items.get(3).getTitle()).isEqualTo("Item 3");
+    }
+
+    @Test
+    public void 인기_제품_개수를_제한한다() {
+        TrendItem trendItem1 = new TrendItem(item1, 10L, 15L, NOW);
+        List<TrendItem> trendItems = new ArrayList<>();
+        for (int i = 0; i < 21; i++) {
+            trendItems.add(trendItem1);
+        }
+        TrendItems trendItemsContainer = new TrendItems(trendItems);
+
+        List<Item> items = trendItemsContainer.getItems();
+
+        assertThat(items).hasSize(20);
     }
 }
