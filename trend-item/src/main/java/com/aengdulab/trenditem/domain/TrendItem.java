@@ -11,7 +11,7 @@ public class TrendItem implements Comparable<TrendItem> {
     private static final int LIKE_WEIGHT = 5;
     private static final int VIEW_WEIGHT = 3;
     private static final double CONTENT_LENGTH_WEIGHT = 0.5;
-    private static final int ELAPSED_TIME_WEIGHT = 2;
+    private static final double ELAPSED_TIME_WEIGHT = -1;
 
     private final Item item;
     private final Long comments;
@@ -29,12 +29,12 @@ public class TrendItem implements Comparable<TrendItem> {
         return (comments * COMMENT_WEIGHT) +
                 (likes * LIKE_WEIGHT) +
                 (item.getViews() * VIEW_WEIGHT) +
-                (item.getContentLength() * CONTENT_LENGTH_WEIGHT) -
+                (item.getContentLength() * CONTENT_LENGTH_WEIGHT) +
                 (item.calculateElapsedMinutes(now) * ELAPSED_TIME_WEIGHT);
     }
 
     @Override
     public int compareTo(TrendItem o) {
-        return Double.compare(calculatePopularity(), o.calculatePopularity());
+        return Double.compare(o.calculatePopularity(), calculatePopularity());
     }
 }
