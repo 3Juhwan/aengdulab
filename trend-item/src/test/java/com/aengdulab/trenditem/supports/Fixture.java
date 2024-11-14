@@ -30,9 +30,9 @@ public class Fixture {
      *
      * <p>상품의 종류는 다음과 같습니다:</p>
      * <ul>
-     *     <li><b>TrendItem</b>: 인기 점수가 높고 트렌드 조건을 충족하는 상품. (최근에 게시된, 많은 좋아요와 댓글을 가진 상품)</li>
-     *     <li><b>OutOfTrendItem</b>: 트렌드 조건을 충족하지만 TrendItem보다 인기 점수가 낮은 상품. (예: 과거에 인기 있었으나 현재는 그만큼의 반응을 얻지 못한 상품)</li>
-     *     <li><b>NonEligibleItem</b>: 인기 상품의 조건을 충족하지 않는 상품. 예를 들어, 게시된 지 오래되었거나 판매가 완료된 상품 등.</li>
+     *     <li><b>TrendItem</b>: 인기 점수가 높고 인기 상품 조건을 충족하는 상품. (다섯 시간 내에 게시된, 많은 좋아요와 댓글을 가진 판매 진행 상품)</li>
+     *     <li><b>OutOfTrendItem</b>: 인기 상품 조건을 충족하지만 TrendItem보다 인기 점수가 낮은 상품.</li>
+     *     <li><b>NonEligibleItem</b>: 인기 상품의 조건을 충족하지 않는 상품. (게시된 지 오래되었거나 판매가 완료된 상품.) </li>
      * </ul>
      *
      * @param outOfTrendItemCount 생성할 `OutOfTrendItem`의 수
