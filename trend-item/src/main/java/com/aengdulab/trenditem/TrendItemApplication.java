@@ -9,5 +9,4 @@ public class TrendItemApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(TrendItemApplication.class, args);
 	}
-
 }
