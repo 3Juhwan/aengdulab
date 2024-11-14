@@ -45,7 +45,7 @@ public class TrendItemsTest {
     }
 
     @Test
-    public void 인기_제품_개수를_제한한다() {
+    public void 인기_상품_개수를_제한한다() {
         TrendItem trendItem1 = new TrendItem(item1, 10L, 15L, NOW);
         List<TrendItem> trendItems = new ArrayList<>();
         for (int i = 0; i < 21; i++) {
