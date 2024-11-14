@@ -3,9 +3,9 @@ package com.aengdulab.trenditem.domain;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static com.aengdulab.trenditem.Fixture.MINUS_THREE_HOURS;
-import static com.aengdulab.trenditem.Fixture.MINUS_TWO_HOURS;
-import static com.aengdulab.trenditem.Fixture.NOW;
+import static com.aengdulab.trenditem.supports.Fixture.MINUS_THREE_HOURS;
+import static com.aengdulab.trenditem.supports.Fixture.MINUS_TWO_HOURS;
+import static com.aengdulab.trenditem.supports.Fixture.NOW;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SuppressWarnings("NonAsciiCharacters")
