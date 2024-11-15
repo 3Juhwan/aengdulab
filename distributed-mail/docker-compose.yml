@@ -1,0 +1,59 @@
+version: "3.9"
+services:
+  db:
+    container_name: mail-db
+    image: mysql:8.0.28
+    platform: linux/x86_64
+    restart: always
+    ports:
+      - "13306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: mail
+      MYSQL_ROOT_USER: root
+      MYSQL_PASSWORD: root
+      TZ: Asia/Seoul
+    volumes:
+      - ./db/mysql/data:/var/lib/mysql
+      - ./db/mysql/init/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    networks:
+      - app-network
+  server1:
+    container_name: mail-server1
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: distributed-mail:latest
+    platform: linux/x86_64
+    ports:
+      - "8081:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/mail?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.MySQL8Dialect
+      SPRING_JPA_PROPERTIES_HIBERNATE_HBM2DDL_AUTO: none
+    depends_on:
+      - db
+    networks:
+      - app-network
+  server2:
+    container_name: mail-server2
+    image: distributed-mail:latest
+    platform: linux/x86_64
+    ports:
+      - "8082:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/mail?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.MySQL8Dialect
+      SPRING_JPA_PROPERTIES_HIBERNATE_HBM2DDL_AUTO: none
+    depends_on:
+      - db
+    networks:
+      - app-network
+networks:
+  app-network:
+    name: app-network
+    driver: bridge
