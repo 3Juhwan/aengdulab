@@ -7,21 +7,20 @@ import com.aengdulab.distributedmail.repository.SentMailEventRepository;
 import io.restassured.RestAssured;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 
+@Slf4j
 @SuppressWarnings("NonAsciiCharacters")
 @Sql(scripts = {"/data.sql"}, executionPhase = ExecutionPhase.BEFORE_TEST_METHOD)
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
 class MultiServerRequestTest {
 
-    private static final Logger log = LoggerFactory.getLogger(MultiServerRequestTest.class);
     private static final int SUBSCRIBER_COUNT = 20;
 
     @Autowired
