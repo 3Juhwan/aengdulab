@@ -24,8 +24,8 @@ public class QuestionSender {
         Subscribe subscribe = subscribeQuestionMessage.getSubscribe();
 
         try {
-            log.info("[메일 발송 시도] email = {}, questionId = {}", subscribe.getEmail(), question.getId());
             mailSender.send(subscribe, question);
+            log.info("[메일 발송 성공] email = {}, questionId = {}", subscribe.getEmail(), question.getId());
             sentMailEventRepository.save(SentMailEvent.success(subscribe, question));
         } catch (Exception e) {
             log.error("[메일 발송 실패] email = {}, questionId = {}", subscribe.getEmail(), question.getId(), e);

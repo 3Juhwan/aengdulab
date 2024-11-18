@@ -1,15 +1,21 @@
-set
-foreign_key_checks=0;
+set foreign_key_checks=0;
 truncate table sent_mail_event;
 truncate table subscribe;
 truncate table question;
 alter table sent_mail_event auto_increment=1;
 alter table subscribe auto_increment=1;
 alter table question auto_increment=1;
-set
-foreign_key_checks=1;
+set foreign_key_checks=1;
 
-insert into subscribe (next_question_sequence, email)
+insert into question (content, title)
+values ('What is your favorite color?', 'Favorite Color'),
+       ('What is your favorite food?', 'Favorite Food'),
+       ('What is your favorite hobby?', 'Favorite Hobby'),
+       ('What is your favorite book?', 'Favorite Book'),
+       ('What is your dream job?', 'Dream Job'),
+       ("What is yout future?", "Future");
+
+insert into subscribe (question_id, email)
 values (1, 'user1@example.com'),
        (2, 'user2@example.com'),
        (3, 'user3@example.com'),
@@ -30,10 +36,3 @@ values (1, 'user1@example.com'),
        (3, 'user18@example.com'),
        (4, 'user19@example.com'),
        (5, 'user20@example.com');
-
-insert into question (content, title)
-values ('What is your favorite color?', 'Favorite Color'),
-       ('What is your favorite food?', 'Favorite Food'),
-       ('What is your favorite hobby?', 'Favorite Hobby'),
-       ('What is your favorite book?', 'Favorite Book'),
-       ('What is your dream job?', 'Dream Job');
