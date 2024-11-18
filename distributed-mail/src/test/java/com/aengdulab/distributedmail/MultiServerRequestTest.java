@@ -3,8 +3,10 @@ package com.aengdulab.distributedmail;
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.aengdulab.distributedmail.domain.SentMailEvent;
 import com.aengdulab.distributedmail.repository.SentMailEventRepository;
 import io.restassured.RestAssured;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import lombok.extern.slf4j.Slf4j;
@@ -39,9 +41,12 @@ class MultiServerRequestTest {
 
         long sentMailCount = sentMailEventRepository.count();
         assertThat(sentMailCount).isEqualTo(SUBSCRIBER_COUNT);
+
+        long uniqueMailReceivedSubscribeCount = getUniqueMailReceivedSubscribeCount();
+        assertThat(uniqueMailReceivedSubscribeCount).isEqualTo(SUBSCRIBER_COUNT);
     }
 
-    private static void sendRequest(ExecutorService executorService, int portNumber) {
+    private void sendRequest(ExecutorService executorService, int portNumber) {
         executorService.submit(() -> {
             given()
                     .port(portNumber)
@@ -50,5 +55,14 @@ class MultiServerRequestTest {
                     .then()
                     .statusCode(200);
         });
+    }
+
+    private long getUniqueMailReceivedSubscribeCount() {
+        List<SentMailEvent> sentMailEvents = sentMailEventRepository.findAll();
+        return sentMailEvents.stream()
+                .filter(SentMailEvent::isSucceeded)
+                .map(SentMailEvent::getSubscribe)
+                .distinct()
+                .count();
     }
 }
