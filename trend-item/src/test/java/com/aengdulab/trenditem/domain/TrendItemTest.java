@@ -21,7 +21,7 @@ public class TrendItemTest {
     }
 
     @Test
-    public void testCalculatePopularity() {
+    public void 인기_점수를_올바르게_계산한다() {
         TrendItem trendItem1 = new TrendItem(item1, 10L, 15L, NOW);
         TrendItem trendItem2 = new TrendItem(item2, 5L, 20L, NOW);
 
