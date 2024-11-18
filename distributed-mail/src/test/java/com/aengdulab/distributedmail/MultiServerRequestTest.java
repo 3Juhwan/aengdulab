@@ -60,7 +60,6 @@ class MultiServerRequestTest {
     private long getUniqueMailReceivedSubscribeCount() {
         List<SentMailEvent> sentMailEvents = sentMailEventRepository.findAll();
         return sentMailEvents.stream()
-                .filter(SentMailEvent::isSucceeded)
                 .map(SentMailEvent::getSubscribe)
                 .distinct()
                 .count();
