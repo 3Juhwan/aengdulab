@@ -29,10 +29,6 @@ public class Item {
         this(null, title, content, views, postedAt, soldOutAt);
     }
 
-    public Item(String title, String content, Long views) {
-        this(null, title, content, views, LocalDateTime.now(), null);
-    }
-
     public Item(String title, String content, Long views, LocalDateTime postedAt) {
         this(null, title, content, views, postedAt, null);
     }
