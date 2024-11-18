@@ -1,8 +1,6 @@
-create
-database if not exists mail;
+create database if not exists mail;
 
-use
-mail;
+use mail;
 
 create table question
 (
@@ -29,12 +27,10 @@ create table subscribe
     primary key (id)
 );
 
-alter table if exists sent_mail_event
+alter table sent_mail_event
     add constraint FK17m4cc9w19g26756wf9xtcm8f
-    foreign key (question_id)
-    references question
+        foreign key (question_id) references question(id);
 
-alter table if exists sent_mail_event
+alter table sent_mail_event
     add constraint FKeyng47xswi660du6w4mw0eqa1
-    foreign key (subscribe_id)
-    references subscribe
+        foreign key (subscribe_id) references subscribe(id);
