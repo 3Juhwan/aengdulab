@@ -70,11 +70,11 @@ public class Item {
         }
     }
 
-    public int getContentLength() {
-        return content.length();
-    }
-
     public Long calculateElapsedMinutes(LocalDateTime comparisonTime) {
         return Duration.between(postedAt, comparisonTime).toMinutes();
+    }
+
+    public int getContentLength() {
+        return content.length();
     }
 }
