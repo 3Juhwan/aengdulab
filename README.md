@@ -13,7 +13,6 @@
     </td>
     <td style="width: 50%; text-align: center;">
     <img src="./images/aengdu.png" alt="앵두 사진" width="300">
-    <p><em>귀여운 앵두의 모습 🐶</em></p>
     </td>
   </tr>
 </table>
