@@ -12,6 +12,7 @@ import java.util.concurrent.Executors;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.jdbc.Sql;
@@ -25,6 +26,12 @@ class MultiServerRequestTest {
 
     private static final int SUBSCRIBER_COUNT = 20;
 
+    /*
+    서버를 다중화할 경우, 새로운 요청에 대한 추가 포트를 설정
+     */
+    @Value("#{T(java.util.Arrays).asList(8080, 9090)}")
+    private List<Integer> serverPort;
+
     @Autowired
     private SentMailEventRepository sentMailEventRepository;
 
@@ -32,9 +39,8 @@ class MultiServerRequestTest {
     void 다중화된_서버에서_균등하고_중복_없이_모든_구독자에게_메일을_발송한다() throws Exception {
         RestAssured.baseURI = "http://localhost";
 
-        try (ExecutorService threadPool = Executors.newFixedThreadPool(2)) {
-            sendRequest(threadPool, 8081);
-            sendRequest(threadPool, 8082);
+        try (ExecutorService threadPool = Executors.newFixedThreadPool(serverPort.size())) {
+            serverPort.forEach(port -> sendRequest(threadPool, port));
         }
 
         Thread.sleep(5000);
