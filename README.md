@@ -1,6 +1,6 @@
 # 앵두랩
 
-**앵두랩**은 Spring 기술을 활용한 프로젝트 진행 중 마주치는 다양한 기술적 과제를 탐구하고, 이를 통해 실질적인 학습과 경험을 쌓는 것을 목표로 합니다. 미션 기반으로 진행되며, 학습한 내용을 공유하고 협력하며 성장하는 공간입니다.
+**앵두랩**은 프로젝트 진행 중 마주치는 다양한 기술적 과제를 탐구하고, 이를 통해 실질적인 학습과 경험을 쌓는 것을 목표로 합니다. 미션 기반으로 진행되며, 학습한 내용을 공유하고 협력하며 성장하는 공간입니다.
 
 ## 🚀 현재 제공하는 미션
 
@@ -15,6 +15,7 @@
     <li>분산 잠금</li>
   </ul>
   </details>
+- **기술 스택**: Java, Spring Boot, Spring Data JPA, MySQL
 - 👉 [문제 확인하기](./ticket/PROBLEM.md)
 
 ### 🔥 **인기 상품 서비스 개선**
@@ -28,6 +29,7 @@
     <li>대규모 트래픽 처리</li>
   </ul>
   </details>
+- **기술 스택**: Java, Spring Boot, Spring Data JPA, MySQL
 - 👉 [문제 확인하기](./trend-item/PROBLEM.md)
 
 ### 📧 **분산 환경에서 메일 발송 시스템 구축**
@@ -42,6 +44,7 @@
     <li>skip locked</li>
   </ul>
   </details>
+- **기술 스택**: Java, Spring Boot, Spring Data JPA, MySQL
 - 👉 [문제 확인하기](./distributed-mail/PROBLEM.md)
 
 ---
