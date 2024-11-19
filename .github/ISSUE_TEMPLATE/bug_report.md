@@ -1,5 +1,6 @@
 ---
 name: 🛠 이슈 제보
+about: 문제 제보
 title: "[BUG/{미션 이름}] 간략한 제목을 입력하세요"
 labels: bug
 
