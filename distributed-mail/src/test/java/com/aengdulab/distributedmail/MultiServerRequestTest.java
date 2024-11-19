@@ -48,8 +48,8 @@ class MultiServerRequestTest {
         long sentMailCount = sentMailEventRepository.count();
         assertThat(sentMailCount).isEqualTo(SUBSCRIBER_COUNT);
 
-        long uniqueMailReceivedSubscribeCount = getUniqueMailReceivedSubscribeCount();
-        assertThat(uniqueMailReceivedSubscribeCount).isEqualTo(SUBSCRIBER_COUNT);
+        long mailReceivedSubscribeUniqueCount = getMailReceivedSubscribeUniqueCount();
+        assertThat(mailReceivedSubscribeUniqueCount).isEqualTo(SUBSCRIBER_COUNT);
     }
 
     private void sendRequest(ExecutorService executorService, int portNumber) {
@@ -63,7 +63,7 @@ class MultiServerRequestTest {
         });
     }
 
-    private long getUniqueMailReceivedSubscribeCount() {
+    private long getMailReceivedSubscribeUniqueCount() {
         List<SentMailEvent> sentMailEvents = sentMailEventRepository.findAll();
         return sentMailEvents.stream()
                 .map(SentMailEvent::getSubscribe)
