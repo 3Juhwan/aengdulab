@@ -2,6 +2,23 @@
 
 **앵두랩**은 프로젝트 진행 중 마주치는 다양한 기술적 과제를 탐구하고, 이를 통해 실질적인 학습과 경험을 쌓는 것을 목표로 합니다. 미션 기반으로 진행되며, 학습한 내용을 공유하고 협력하며 성장하는 공간입니다.
 
+## 🐾 앵두랩의 의미
+
+<div style="display: flex; align-items: center;">
+
+<div style="flex: 1; padding-right: 20px;">
+<p><strong>"앵두랩"</strong>은 메인테이너의 강아지 <strong>앵두</strong>의 이름에서 유래되었습니다.<br>
+앵두는 태어난 지 <strong>2주 만에 몸무게가 2배로 늘며 빠르게 성장</strong>했습니다.<br>
+이처럼 짧은 시간에 <strong>빠르게 배우고 성장하는 공간</strong>이 되기를 바라는 마음으로 이름을 지었습니다.</p>
+</div>
+
+<div style="flex: 1; text-align: center;">
+<img src="./images/aengdu.png" alt="앵두 사진" width="300">
+<p><em>귀여운 앵두의 모습 🐶</em></p>
+</div>
+
+</div>
+
 ## 🚀 현재 제공하는 미션
 
 ### 🛰 **우주여행 티켓 재고 관리 시스템 설계**
