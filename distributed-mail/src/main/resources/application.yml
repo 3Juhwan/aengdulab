@@ -12,3 +12,15 @@ spring:
         format_sql: true
         show_sql: false
         hbm2ddl.auto: none
+  mail:
+    host: localhost
+    port: 11025
+    console-port: 18025
+    username:
+    password:
+    properties:
+      mail:
+        smtp:
+          auth: false
+          starttls:
+            enable: false

@@ -16,3 +16,9 @@ services:
     volumes:
       - ./db/mysql/data:/var/lib/mysql
       - ./db/mysql/init/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+  mail:
+    container_name: smtp-server
+    image: mailhog/mailhog
+    ports:
+      - "11025:1025"
+      - "18025:8025"
