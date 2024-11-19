@@ -4,20 +4,19 @@
 
 ## 🐾 앵두랩의 의미
 
-<div style="display: flex; align-items: center;">
-
-<div style="flex: 1; padding-right: 20px;">
-<p><strong>"앵두랩"</strong>은 메인테이너의 강아지 <strong>앵두</strong>의 이름에서 유래되었습니다.<br>
-앵두는 태어난 지 <strong>2주 만에 몸무게가 2배로 늘며 빠르게 성장</strong>했습니다.<br>
-이처럼 짧은 시간에 <strong>빠르게 배우고 성장하는 공간</strong>이 되기를 바라는 마음으로 이름을 지었습니다.</p>
-</div>
-
-<div style="flex: 1; text-align: center;">
-<img src="./images/aengdu.png" alt="앵두 사진" width="300">
-<p><em>귀여운 앵두의 모습 🐶</em></p>
-</div>
-
-</div>
+<table>
+  <tr>
+    <td style="width: 50%; vertical-align: top; padding-right: 20px;">
+    <p><strong>"앵두랩"</strong>은 메인테이너의 강아지 <strong>앵두</strong>의 이름에서 유래되었습니다.<br>
+    앵두는 태어난 지 <strong>2주 만에 몸무게가 2배로 늘며 빠르게 성장</strong>했습니다.<br>
+    이처럼 짧은 시간에 <strong>빠르게 배우고 성장하는 공간</strong>이 되기를 바라는 마음으로 이름을 지었습니다.</p>
+    </td>
+    <td style="width: 50%; text-align: center;">
+    <img src="./images/aengdu.png" alt="앵두 사진" width="300">
+    <p><em>귀여운 앵두의 모습 🐶</em></p>
+    </td>
+  </tr>
+</table>
 
 ## 🚀 현재 제공하는 미션
 
