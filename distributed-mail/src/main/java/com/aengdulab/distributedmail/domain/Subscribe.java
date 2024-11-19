@@ -28,6 +28,12 @@ public class Subscribe {
     @ManyToOne(fetch = FetchType.EAGER)
     private Question question;
 
+    public Subscribe(Long id, String email, Question question) {
+        this.id = id;
+        this.email = email;
+        this.question = question;
+    }
+
     public void setNextQuestion(Question question) {
         this.question = question;
     }
