@@ -6,17 +6,42 @@
 
 ### 🛰 **우주여행 티켓 재고 관리 시스템 설계**
 - **목표**: 1분 내에 매진되는 인기 있는 행성 여행 티켓 판매 시스템에서 **동시 발급 문제** 해결
-- **주요 학습 내용**: Java 잠금, 데이터베이스 수준의 잠금, 분산 잠금
+- **주요 학습 내용**:
+  <details style="margin-left: 16px;">
+  <summary><strong>확인하기</strong></summary>
+  <ul>
+    <li>Java 잠금</li>
+    <li>데이터베이스 수준의 잠금</li>
+    <li>분산 잠금</li>
+  </ul>
+  </details>
 - 👉 [문제 확인하기](./ticket/PROBLEM.md)
 
 ### 🔥 **인기 상품 서비스 개선**
-- **목표**: 성능 최적화 및 사용자 경험 향상
-- **주요 학습 내용**: 캐싱, 쿼리 최적화, 대규모 트래픽 처리
+- **목표**: **성능 최적화** 및 사용자 경험 향상
+- **주요 학습 내용**:
+  <details style="margin-left: 16px;">
+  <summary><strong>확인하기</strong></summary>
+  <ul>
+    <li>캐싱</li>
+    <li>쿼리 최적화</li>
+    <li>대규모 트래픽 처리</li>
+  </ul>
+  </details>
 - 👉 [문제 확인하기](./trend-item/PROBLEM.md)
 
 ### 📧 **분산 환경에서 메일 발송 시스템 구축**
-- **목표**: 분산 환경에서 중복 발송 없는 안정적인 메일 발송 시스템을 구축
-- **주요 학습 내용**: 모듈러 연산, 분산 잠금, 분산 스케줄링, skip locked
+- **목표**: 분산 환경에서 **중복 발송 없는 안정적인** 메일 발송 시스템을 구축
+- **주요 학습 내용**:
+  <details style="margin-left: 16px;">
+  <summary><strong>확인하기</strong></summary>
+  <ul>
+    <li>모듈러 연산</li>
+    <li>분산 잠금</li>
+    <li>분산 스케줄링</li>
+    <li>skip locked</li>
+  </ul>
+  </details>
 - 👉 [문제 확인하기](./distributed-mail/PROBLEM.md)
 
 ---
