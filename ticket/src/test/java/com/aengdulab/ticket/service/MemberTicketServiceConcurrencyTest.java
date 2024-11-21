@@ -56,9 +56,7 @@ class MemberTicketServiceConcurrencyTest {
 
         int threadCount = memberCount * MemberTicket.MEMBER_TICKET_COUNT_MAX;
         TimeMeasure.measureTime(() -> {
-            try (ExecutorService executorService = Executors.newFixedThreadPool(threadCount)) {
-                sendMultipleRequests(executorService, members, ticket);
-            }
+            sendMultipleRequests(threadCount, members, ticket);
         });
 
         assertThat(getTicketQuantity(ticket)).isEqualTo(0);
@@ -78,9 +76,7 @@ class MemberTicketServiceConcurrencyTest {
 
         int threadCount = memberCount * ticketIssueCount;
         TimeMeasure.measureTime(() -> {
-            try (ExecutorService executorService = Executors.newFixedThreadPool(threadCount)) {
-                sendMultipleRequests(executorService, members, jupiterTicket, marsTicket);
-            }
+            sendMultipleRequests(threadCount, members, jupiterTicket, marsTicket);
         });
 
         assertThat(getTicketQuantity(jupiterTicket)).isGreaterThanOrEqualTo(0);
@@ -99,9 +95,7 @@ class MemberTicketServiceConcurrencyTest {
 
         int threadCount = memberCount * MemberTicket.MEMBER_TICKET_COUNT_MAX;
         TimeMeasure.measureTime(() -> {
-            try (ExecutorService executorService = Executors.newFixedThreadPool(threadCount)) {
-                sendMultipleRequests(executorService, members, ticket);
-            }
+            sendMultipleRequests(threadCount, members, ticket);
         });
 
         assertThat(getTicketQuantity(ticket)).isEqualTo(0);
@@ -110,21 +104,23 @@ class MemberTicketServiceConcurrencyTest {
         }
     }
 
-    private void sendMultipleRequests(ExecutorService executorService, List<Member> members, Ticket... tickets) {
+    private void sendMultipleRequests(Integer threadCount, List<Member> members, Ticket... tickets) {
         AtomicInteger succeedRequestCount = new AtomicInteger(0);
         AtomicInteger failRequestCount = new AtomicInteger(0);
 
-        for (Member member : members) {
-            for (int i = 0; i < MemberTicket.MEMBER_TICKET_COUNT_MAX; i++) {
-                executorService.submit(() -> {
-                    try {
-                        memberTicketService.issue(member.getId(), getRandomTicket(tickets).getId());
-                        succeedRequestCount.incrementAndGet();
-                    } catch (Exception e) {
-                        log.error("멤버 티켓 발행 중 오류 발생", e);
-                        failRequestCount.incrementAndGet();
-                    }
-                });
+        try (ExecutorService executorService = Executors.newFixedThreadPool(threadCount)) {
+            for (Member member : members) {
+                for (int i = 0; i < MemberTicket.MEMBER_TICKET_COUNT_MAX; i++) {
+                    executorService.submit(() -> {
+                        try {
+                            memberTicketService.issue(member.getId(), getRandomTicket(tickets).getId());
+                            succeedRequestCount.incrementAndGet();
+                        } catch (Exception e) {
+                            log.error("멤버 티켓 발행 중 오류 발생", e);
+                            failRequestCount.incrementAndGet();
+                        }
+                    });
+                }
             }
         }
 
