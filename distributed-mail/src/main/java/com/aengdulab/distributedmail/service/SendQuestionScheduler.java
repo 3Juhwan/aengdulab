@@ -5,6 +5,7 @@ import com.aengdulab.distributedmail.domain.Subscribe;
 import com.aengdulab.distributedmail.domain.SubscribeQuestionMessage;
 import com.aengdulab.distributedmail.repository.QuestionRepository;
 import com.aengdulab.distributedmail.repository.SubscribeRepository;
+import com.aengdulab.distributedmail.service.support.DistributedSupport;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ public class SendQuestionScheduler {
     private final QuestionSender questionSender;
     private final SubscribeRepository subscribeRepository;
     private final QuestionRepository questionRepository;
+    private final DistributedSupport distributedSupport;
 
     @Transactional
     @Scheduled(cron = "0 0 9 * * *", zone = "Asia/Seoul")
@@ -32,6 +34,7 @@ public class SendQuestionScheduler {
 
     private void sendQuestionMails(List<Subscribe> subscribes) {
         subscribes.stream()
+                .filter(distributedSupport::isMine)
                 .flatMap(subscribe -> choiceQuestion(subscribe).stream())
                 .forEach(questionSender::sendQuestion);
     }
