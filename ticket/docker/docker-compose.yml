@@ -1,6 +1,7 @@
 version: "3.9"
 services:
   db:
+    container_name: ticket-db
     image: mysql:8.0.28
     platform: linux/x86_64
     restart: always
