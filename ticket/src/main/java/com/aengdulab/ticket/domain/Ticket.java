@@ -33,11 +33,10 @@ public class Ticket {
         this.quantity = quantity;
     }
 
-    public boolean issuable() {
-        return quantity > 0;
-    }
-
     public void decrementQuantity() {
+        if (quantity <= 0) {
+            throw new IllegalArgumentException("티켓 재고가 소진되었습니다.");
+        }
         quantity--;
     }
 }

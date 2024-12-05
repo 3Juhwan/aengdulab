@@ -16,8 +16,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class MemberTicket {
 
-    public static final int MEMBER_TICKET_COUNT_MAX = 2;
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
