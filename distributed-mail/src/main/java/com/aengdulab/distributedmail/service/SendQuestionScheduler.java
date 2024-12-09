@@ -41,16 +41,17 @@ public class SendQuestionScheduler {
     }
 
     private int getServerIndex(int serPort) {
-        if (serPort == 8080) {
-            return 0;
-        } else if (serPort == 9090) {
-            return 1;
-        }
-        return 2;
+        return switch (serPort) {
+            case 8080 -> 0;
+            case 8888 -> 1;
+            case 9090 -> 2;
+            case 9999 -> 3;
+            default -> throw new IllegalArgumentException("Invalid ser port " + serPort);
+        };
     }
 
     private int getTotalServerCount() {
-        return 3;
+        return 4;
     }
 
     private boolean isResponsibleServer(int subscribeId, int serverCount, int serverIndex) {

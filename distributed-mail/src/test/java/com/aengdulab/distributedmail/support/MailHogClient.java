@@ -43,9 +43,9 @@ public class MailHogClient implements TestMailClient {
      * @see <a href="https://github.com/mailhog/MailHog/blob/master/docs/APIv2/swagger-2.0.json">
      * MailHog API 문서</a>
      */
-    public List<String> getMailReceivedSubscribes() {
+    public List<String> getMailReceivedSubscribes(long sentMailCount) {
         ExtractableResponse<Response> response = RestAssured.when()
-                .get(concatUrl(host, consolePort, GET_ALL_MESSAGES_URL)).then().statusCode(HttpStatus.OK.value()).and()
+                .get(concatUrl(host, consolePort, GET_ALL_MESSAGES_URL, sentMailCount)).then().statusCode(HttpStatus.OK.value()).and()
                 .extract();
 
         return parseJsonMailReceivedSubscribes(response);
@@ -57,11 +57,11 @@ public class MailHogClient implements TestMailClient {
     }
 
     public void deleteAll() {
-        RestAssured.when().delete(concatUrl(host, consolePort, DELETE_ALL_MESSAGES_URL)).then()
+        RestAssured.when().delete(concatUrl(host, consolePort, DELETE_ALL_MESSAGES_URL, 50L)).then()
                 .statusCode(HttpStatus.OK.value());
     }
 
-    private String concatUrl(String host, String port, String path) {
-        return "http://" + host + ":" + port + path;
+    private String concatUrl(String host, String port, String path, long limit) {
+        return "http://" + host + ":" + port + path + "?limit=" + limit;
     }
 }
