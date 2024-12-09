@@ -75,13 +75,12 @@ class MultiServerRequestTest {
         try (ExecutorService threadPool = Executors.newFixedThreadPool(serverPorts.size())) {
             serverPorts.forEach(port -> sendRequest(threadPool, port));
         }
+        Thread.sleep(10000);
 
-        Thread.sleep(2000);
-
-        long sentMailCount = sentMailEventRepository.count();
-        long mailReceivedSubscribeUniqueCount = getMailReceivedSubscribeUniqueCount();
         List<String> initSubscribes = getInitSubscribeEmails();
         List<String> mailReceivedSubscribes = testMailClient.getMailReceivedSubscribes();
+        long sentMailCount = sentMailEventRepository.count();
+        long mailReceivedSubscribeUniqueCount = getMailReceivedSubscribeUniqueCount();
 
         assertAll(
                 () -> assertThat(sentMailCount).isEqualTo(SUBSCRIBER_COUNT),

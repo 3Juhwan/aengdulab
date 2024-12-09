@@ -1,5 +1,6 @@
 package com.aengdulab.distributedmail.service;
 
+import com.aengdulab.distributedmail.controller.ServerPortProvider;
 import com.aengdulab.distributedmail.domain.Question;
 import com.aengdulab.distributedmail.domain.Subscribe;
 import com.aengdulab.distributedmail.domain.SubscribeQuestionMessage;
@@ -21,13 +22,39 @@ public class SendQuestionScheduler {
     private final QuestionSender questionSender;
     private final SubscribeRepository subscribeRepository;
     private final QuestionRepository questionRepository;
+    private final ServerPortProvider serPortProvider;
 
     @Transactional
     @Scheduled(cron = "0 0 9 * * *", zone = "Asia/Seoul")
     public void sendQuestion() {
-        List<Subscribe> subscribes = subscribeRepository.findAll();
+        List<Subscribe> subscribes = getSubscribesForThisServer(serPortProvider.getServerPort());
         sendQuestionMails(subscribes);
         updateNextQuestions(subscribes);
+    }
+
+    private List<Subscribe> getSubscribesForThisServer(int serPort) {
+        int serverIndex = getServerIndex(serPort);
+        int serverCount = getTotalServerCount();
+        return subscribeRepository.findAll().stream()
+                .filter(subscribe -> isResponsibleServer(subscribe.getId().intValue(), serverCount, serverIndex))
+                .toList();
+    }
+
+    private int getServerIndex(int serPort) {
+        if (serPort == 8080) {
+            return 0;
+        } else if (serPort == 9090) {
+            return 1;
+        }
+        return 2;
+    }
+
+    private int getTotalServerCount() {
+        return 3;
+    }
+
+    private boolean isResponsibleServer(int subscribeId, int serverCount, int serverIndex) {
+        return (subscribeId % serverCount) == serverIndex;
     }
 
     private void sendQuestionMails(List<Subscribe> subscribes) {
