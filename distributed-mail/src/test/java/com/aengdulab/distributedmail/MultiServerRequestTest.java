@@ -77,10 +77,10 @@ class MultiServerRequestTest {
         }
         Thread.sleep(10000);
 
-        List<String> initSubscribes = getInitSubscribeEmails();
-        List<String> mailReceivedSubscribes = testMailClient.getMailReceivedSubscribes();
         long sentMailCount = sentMailEventRepository.count();
         long mailReceivedSubscribeUniqueCount = getMailReceivedSubscribeUniqueCount();
+        List<String> initSubscribes = getInitSubscribeEmails();
+        List<String> mailReceivedSubscribes = testMailClient.getMailReceivedSubscribes();
 
         assertAll(
                 () -> assertThat(sentMailCount).isEqualTo(SUBSCRIBER_COUNT),
