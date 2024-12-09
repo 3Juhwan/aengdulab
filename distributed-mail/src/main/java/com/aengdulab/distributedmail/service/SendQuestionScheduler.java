@@ -1,5 +1,6 @@
 package com.aengdulab.distributedmail.service;
 
+import com.aengdulab.distributedmail.ServerPortProvider;
 import com.aengdulab.distributedmail.domain.Question;
 import com.aengdulab.distributedmail.domain.Subscribe;
 import com.aengdulab.distributedmail.domain.SubscribeQuestionMessage;
@@ -21,13 +22,40 @@ public class SendQuestionScheduler {
     private final QuestionSender questionSender;
     private final SubscribeRepository subscribeRepository;
     private final QuestionRepository questionRepository;
+    private final ServerPortProvider serPortProvider;
 
     @Transactional
     @Scheduled(cron = "0 0 9 * * *", zone = "Asia/Seoul")
     public void sendQuestion() {
-        List<Subscribe> subscribes = subscribeRepository.findAll();
+        List<Subscribe> subscribes = getSubscribesForThisServer(serPortProvider.getServerPort());
         sendQuestionMails(subscribes);
         updateNextQuestions(subscribes);
+    }
+
+    private List<Subscribe> getSubscribesForThisServer(int serPort) {
+        int serverIndex = getServerIndex(serPort);
+        int serverCount = getTotalServerCount();
+        return subscribeRepository.findAll().stream()
+                .filter(subscribe -> isResponsibleServer(subscribe.getId().intValue(), serverCount, serverIndex))
+                .toList();
+    }
+
+    private int getServerIndex(int serPort) {
+        return switch (serPort) {
+            case 8080 -> 0;
+            case 8888 -> 1;
+            case 9090 -> 2;
+            case 9999 -> 3;
+            default -> throw new IllegalArgumentException("Invalid ser port " + serPort);
+        };
+    }
+
+    private int getTotalServerCount() {
+        return 4;
+    }
+
+    private boolean isResponsibleServer(int subscribeId, int serverCount, int serverIndex) {
+        return (subscribeId % serverCount) == serverIndex;
     }
 
     private void sendQuestionMails(List<Subscribe> subscribes) {

@@ -4,7 +4,7 @@ import java.util.List;
 
 public interface TestMailClient {
 
-    List<String> getMailReceivedSubscribes();
+    List<String> getMailReceivedSubscribes(long sentMailCount);
 
     void deleteAll();
 }

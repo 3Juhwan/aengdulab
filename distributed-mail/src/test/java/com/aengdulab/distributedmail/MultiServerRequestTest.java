@@ -32,12 +32,12 @@ class MultiServerRequestTest {
     /*
     전체 구독자 수 설정
      */
-    private static final int SUBSCRIBER_COUNT = 20;
+    private static final int SUBSCRIBER_COUNT = 100;
 
     /*
     서버를 다중화할 경우, 새로운 요청에 대한 추가 포트를 설정
      */
-    private static final List<Integer> serverPorts = List.of(8080, 9090, 9999);
+    private static final List<Integer> serverPorts = List.of(8080, 8888, 9090, 9999);
 
     @Autowired
     private SentMailEventRepository sentMailEventRepository;
@@ -75,13 +75,14 @@ class MultiServerRequestTest {
         try (ExecutorService threadPool = Executors.newFixedThreadPool(serverPorts.size())) {
             serverPorts.forEach(port -> sendRequest(threadPool, port));
         }
-
-        Thread.sleep(2000);
+        while (sentMailEventRepository.count() < SUBSCRIBER_COUNT) {
+            Thread.sleep(500);
+        }
 
         long sentMailCount = sentMailEventRepository.count();
         long mailReceivedSubscribeUniqueCount = getMailReceivedSubscribeUniqueCount();
         List<String> initSubscribes = getInitSubscribeEmails();
-        List<String> mailReceivedSubscribes = testMailClient.getMailReceivedSubscribes();
+        List<String> mailReceivedSubscribes = testMailClient.getMailReceivedSubscribes(sentMailCount);
 
         assertAll(
                 () -> assertThat(sentMailCount).isEqualTo(SUBSCRIBER_COUNT),
