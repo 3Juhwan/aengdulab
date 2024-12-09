@@ -1,4 +1,4 @@
-package com.aengdulab.distributedmail.controller;
+package com.aengdulab.distributedmail;
 
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;

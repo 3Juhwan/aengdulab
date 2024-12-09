@@ -1,6 +1,6 @@
 package com.aengdulab.distributedmail.service;
 
-import com.aengdulab.distributedmail.controller.ServerPortProvider;
+import com.aengdulab.distributedmail.ServerPortProvider;
 import com.aengdulab.distributedmail.domain.Question;
 import com.aengdulab.distributedmail.domain.Subscribe;
 import com.aengdulab.distributedmail.domain.SubscribeQuestionMessage;
