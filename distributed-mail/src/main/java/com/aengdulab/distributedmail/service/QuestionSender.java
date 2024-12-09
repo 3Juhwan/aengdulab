@@ -31,6 +31,5 @@ public class QuestionSender {
             log.error("[메일 발송 실패] email = {}, questionId = {}", subscribe.getEmail(), question.getId(), e);
             sentMailEventRepository.save(SentMailEvent.fail(subscribe, question));
         }
-        log.info("SentMailEventRepository Count: {}개", sentMailEventRepository.count());
     }
 }
