@@ -54,3 +54,11 @@ public class ServerPortProvider {
 추가로 테스트의 `Thread.sleep(2000);`의 시간이 부족한 지 어떨 때는 `sentMailCount`와 `mailReceivedSubscribeUniqueCount`, `mailReceivedSubscribes`가 0으로 나올때도 있고 20으로 통과할 때도 있고 오락가락해서 한번 `Thread.sleep(5000);`으로 해봤습니다.
 그랬더니 테스트가 실패할때는 `sentMailCount`와 `mailReceivedSubscribeUniqueCount`는 0이 나오는데 `mailReceivedSubscribes`에는 정상적으로 20개가 다 들어있었습니다.
 그래서 `Thread.sleep(10000);`으로 늘렸더니 정상적으로 통과합니다. 해당 부분은 좀 더 공부해봐야겠네요.
+
+12/09 21:34<br>
+우선 아래처럼 테스트를 수정했습니다.
+```java
+while (sentMailEventRepository.count() < SUBSCRIBER_COUNT) {
+    Thread.sleep(500);
+}
+```
