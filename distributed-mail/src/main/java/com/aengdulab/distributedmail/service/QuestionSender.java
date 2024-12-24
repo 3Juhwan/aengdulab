@@ -23,13 +23,15 @@ public class QuestionSender {
         Question question = subscribeQuestionMessage.getQuestion();
         Subscribe subscribe = subscribeQuestionMessage.getSubscribe();
 
+        SentMailEvent sentMailEvent;
         try {
             mailSender.send(subscribe, question);
             log.info("[메일 발송 성공] email = {}, questionId = {}", subscribe.getEmail(), question.getId());
-            sentMailEventRepository.save(SentMailEvent.success(subscribe, question));
+            sentMailEvent = SentMailEvent.success(subscribe, question);
         } catch (Exception e) {
             log.error("[메일 발송 실패] email = {}, questionId = {}", subscribe.getEmail(), question.getId(), e);
-            sentMailEventRepository.save(SentMailEvent.fail(subscribe, question));
+            sentMailEvent = SentMailEvent.fail(subscribe, question);
         }
+        sentMailEventRepository.save(sentMailEvent);
     }
 }
